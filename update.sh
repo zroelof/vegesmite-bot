@@ -5,7 +5,7 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-BASE_DIRECTORY_PATH="/opt/vegesmites"
+BASE_DIRECTORY_PATH="/opt/vegesmite"
 
 download_files() {
     local path="$1"
