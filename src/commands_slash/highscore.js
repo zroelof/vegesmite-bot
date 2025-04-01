@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const { fetchStats, getClogHighscores } = require('../WiseOldMan');
+const { WOM_GROUP_NUMBER } = require('../config');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -253,7 +254,7 @@ function prepareDiscordEmbeds(highscores, groupDetails, metricType, client, guil
 			embed
 				.setTitle(title)
 				.setDescription(
-					`Top players in each ${eachName} for ${groupDetails.name}\nData from the [Wise Old Man](https://wiseoldman.net/groups/7154)`,
+					`Top players in each ${eachName} for ${groupDetails.name}\nData from the [Wise Old Man](https://wiseoldman.net/groups/${WOM_GROUP_NUMBER})`,
 				)
 				.setThumbnail(thumbnail);
 		}
@@ -279,7 +280,9 @@ function prepareClogEmbeds(clogEntries, groupDetails, client, guild) {
 		return [];
 	}
 	// Create fields for collection log entries
-	const validClogEntries = clogEntries.filter(entry => entry.data.score !== -1 && entry.data.rank !== -1);
+	const validClogEntries = clogEntries.filter(
+		entry => entry.data.score !== -1 && entry.data.rank !== -1,
+	);
 	const fields = createClogFields(validClogEntries, client, guild);
 	// Split fields into chunks to keep within Discord's limits
 	const fieldChunks = chunkFields(fields, config.fieldsPerRow);
@@ -291,7 +294,7 @@ function prepareClogEmbeds(clogEntries, groupDetails, client, guild) {
 			embed
 				.setTitle(`Collection Log Highscores`)
 				.setDescription(
-					`Top Collection Log hunters for ${groupDetails.name}\nData from the [Wise Old Man](https://wiseoldman.net/groups/7154)`,
+					`Top Collection Log hunters for ${groupDetails.name}\nData from the [Wise Old Man](https://wiseoldman.net/groups/${WOM_GROUP_NUMBER})`,
 				)
 				.setThumbnail('https://oldschool.runescape.wiki/images/Collection_log.png');
 		}
