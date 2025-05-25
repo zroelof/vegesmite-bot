@@ -41,11 +41,11 @@ async function updateMessage(bot) {
 		}
 		const emojis = guild.emojis.cache;
 		const outdatedRanks = await checkTotalLevelRanks(WOM_GROUP_NUMBER);
-		const pages = preparePages(outdatedRanks, emojis, 1750);
-		let message = await findOrCreateMessage(bot, channel);
-		let components = prepareComponents(pages.length > 1, 0, pages.length);
 		const title = '## 📊 Rank Status\n';
 		const footer = getFooterNote();
+		const pages = preparePages(outdatedRanks, emojis, 2000 - footer.length - title.length);
+		let message = await findOrCreateMessage(bot, channel);
+		let components = prepareComponents(pages.length > 1, 0, pages.length);
 		let content = pages.length > 0 ? pages[0] : '\n**✅ All ranks are up to date.**';
 		content = title + content + footer;
 		await message.edit({
@@ -91,7 +91,6 @@ function preparePages(outdatedMembers, emojis, maxCharsPerPage) {
 		memberCount++;
 		const currentRankEmoji = getRankEmoji(emojis, member.currentRole);
 		const requiredRankEmoji = getRankEmoji(emojis, member.requiredRole);
-		// Improved formatting with better spacing and structure
 		const line =
 			`**${memberCount}.** [**${member.displayName}**](https://wiseoldman.net/players/${encodeURIComponent(member.displayName)}) ` +
 			`${currentRankEmoji} ➜ ${requiredRankEmoji} *(Lvl: ${member.totalLevel.toLocaleString()})*\n`;
@@ -130,16 +129,16 @@ function prepareComponents(hasMultiplePages, currentPage = 0, totalPages = 1) {
 	const components = [];
 	if (hasMultiplePages) {
 		const buttons = [];
-
 		// Previous button
-		buttons.push(
-			new ButtonBuilder()
-				.setCustomId('rankrole-previous')
-				.setLabel('◀ Previous')
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(currentPage === 0),
-		);
-
+		if (currentPage !== 0) {
+			buttons.push(
+				new ButtonBuilder()
+					.setCustomId('rankrole-previous')
+					.setLabel('◀ Previous')
+					.setStyle(ButtonStyle.Secondary)
+					.setDisabled(currentPage === 0),
+			);
+		}
 		// Page indicator button (disabled, shows current page)
 		buttons.push(
 			new ButtonBuilder()
@@ -148,16 +147,16 @@ function prepareComponents(hasMultiplePages, currentPage = 0, totalPages = 1) {
 				.setStyle(ButtonStyle.Secondary)
 				.setDisabled(true),
 		);
-
 		// Next button
-		buttons.push(
-			new ButtonBuilder()
-				.setCustomId('rankrole-next')
-				.setLabel('Next ▶')
-				.setStyle(ButtonStyle.Secondary)
-				.setDisabled(currentPage >= totalPages - 1),
-		);
-
+		if (currentPage !== totalPages - 1) {
+			buttons.push(
+				new ButtonBuilder()
+					.setCustomId('rankrole-next')
+					.setLabel('Next ▶')
+					.setStyle(ButtonStyle.Secondary)
+					.setDisabled(currentPage >= totalPages - 1),
+			);
+		}
 		components.push(new ActionRowBuilder().addComponents(buttons));
 	}
 	return components;
@@ -175,7 +174,6 @@ async function checkTotalLevelRanks(groupId) {
 			console.error('Invalid rank/group data:', group);
 			return;
 		}
-
 		for (const entry of group) {
 			if (!entry) continue;
 			const displayName = entry.player.displayName;
